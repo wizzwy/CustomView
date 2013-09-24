@@ -10,6 +10,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -42,17 +43,17 @@ public class CustomSeekBar extends LinearLayout {
 
 	public SeekBar mSeekBar;
 	private TextView mTitle;
+	private TextView mDescription;
 	private TextView mValue;
 	private TextView mMinValue;
 	private TextView mMaxValue;
 
-	LayoutInflater mInflater;
-
 	public void init() {
-		mInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		mInflater.inflate(R.layout.custom_view_seekbar, this, true);
+		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		inflater.inflate(R.layout.custom_view_seekbar, this, true);
 
 		mTitle = (TextView) findViewById(R.id.seekBarTitle);
+		mDescription = (TextView) findViewById(R.id.seekBarDescription);
 		mValue = (TextView) findViewById(R.id.seekBarValue);
 		mMinValue = (TextView) findViewById(R.id.seekBarMinValue);
 		mMaxValue = (TextView) findViewById(R.id.seekBarMaxValue);
@@ -61,10 +62,28 @@ public class CustomSeekBar extends LinearLayout {
 
 	public void setTitle(CharSequence title) {
 		mTitle.setText(title);
+		setTitleVisibility(true);
 	}
 
 	public void setTitle(int title, Object... formatArgs) {
 		setTitle(getContext().getString(title, formatArgs));
+	}
+
+	public void setTitleVisibility(boolean show){
+		mTitle.setVisibility(show ? View.VISIBLE : View.GONE);
+	}
+
+	public void setDescription(CharSequence description) {
+		mDescription.setText(description);
+		setDescriptionVisibility(true);
+	}
+
+	public void setDescription(int description, Object... formatArgs) {
+		setDescription(getContext().getString(description, formatArgs));
+	}
+
+	public void setDescriptionVisibility(boolean show) {
+		mDescription.setVisibility(show ? View.VISIBLE : View.GONE);
 	}
 
 	public void setValue(CharSequence value) {

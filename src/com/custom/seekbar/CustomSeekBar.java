@@ -122,10 +122,18 @@ public class CustomSeekBar extends LinearLayout {
 		setMax(getContext().getString(value, formatArgs));
 	}
 
+	/**
+	 * 初始化seekBar时设置Progress请使用setProgressTimer
+	 * @param progress
+	 */
 	public void setProgress(int progress) {
 		mSeekBar.setProgress(progress);
 	}
 
+	/**
+	 * 启用定时器设置该值，因为View在初始化时不能活的大小
+	 * @param progress
+	 */
 	public void setProgressTimer(final int progress) {
 		Timer timer = new Timer("INIT_SEEKBAR_PROGRESS");
 		final Handler handler = new Handler();

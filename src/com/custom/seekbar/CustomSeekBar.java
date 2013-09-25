@@ -20,8 +20,8 @@ import android.widget.TextView;
 /**
  * @Author: zwy
  * @E-mail: weiyazhang1987@gmail.com
- * @time Create Date: 2013-9-23ÏÂÎç4:48:35
- * @Message:ÖØ¶¨ÒåseekbarÊ¹ÏÔÊ¾¸üÇåÎú
+ * @time Create Date: 2013-9-23ä¸‹åˆ4:48:35
+ * @Message:é‡å®šä¹‰seekbarä½¿æ˜¾ç¤ºæ›´æ¸…æ™°
  **/
 public class CustomSeekBar extends LinearLayout {
 
@@ -123,7 +123,7 @@ public class CustomSeekBar extends LinearLayout {
 	}
 
 	/**
-	 * ³õÊ¼»¯seekBarÊ±ÉèÖÃProgressÇëÊ¹ÓÃsetProgressTimer
+	 * åˆå§‹åŒ–seekBaræ—¶è®¾ç½®Progressè¯·ä½¿ç”¨setProgressTimer
 	 * @param progress
 	 */
 	public void setProgress(int progress) {
@@ -131,7 +131,7 @@ public class CustomSeekBar extends LinearLayout {
 	}
 
 	/**
-	 * ÆôÓÃ¶¨Ê±Æ÷ÉèÖÃ¸ÃÖµ£¬ÒòÎªViewÔÚ³õÊ¼»¯Ê±²»ÄÜ»îµÄ´óĞ¡
+	 * å¯ç”¨å®šæ—¶å™¨è®¾ç½®è¯¥å€¼ï¼Œå› ä¸ºViewåœ¨åˆå§‹åŒ–æ—¶ä¸èƒ½æ´»çš„å¤§å°
 	 * @param progress
 	 */
 	public void setProgressTimer(final int progress) {

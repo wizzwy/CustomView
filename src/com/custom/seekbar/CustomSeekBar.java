@@ -20,8 +20,8 @@ import android.widget.TextView;
 /**
  * @Author: zwy
  * @E-mail: weiyazhang1987@gmail.com
- * @time Create Date: 2013-9-23ÏÂÎç4:48:35
- * @Message:ÖØ¶¨ÒåseekbarÊ¹ÏÔÊ¾¸üÇåÎú
+ * @time Create Date: 2013-9-23ä¸‹åˆ4:48:35
+ * @Message:é‡å®šä¹‰seekbarä½¿æ˜¾ç¤ºæ›´æ¸…æ™°
  **/
 public class CustomSeekBar extends LinearLayout {
 
@@ -52,12 +52,12 @@ public class CustomSeekBar extends LinearLayout {
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.custom_view_seekbar, this, true);
 
-		mTitle = (TextView) findViewById(R.id.seekBarTitle);
-		mDescription = (TextView) findViewById(R.id.seekBarDescription);
-		mValue = (TextView) findViewById(R.id.seekBarValue);
-		mMinValue = (TextView) findViewById(R.id.seekBarMinValue);
-		mMaxValue = (TextView) findViewById(R.id.seekBarMaxValue);
-		mSeekBar = (SeekBar) findViewById(R.id.seekBar);
+		mTitle = (TextView) findViewById(R.id.seekbar_title);
+		mDescription = (TextView) findViewById(R.id.seekbar_description);
+		mValue = (TextView) findViewById(R.id.seekbar_value);
+		mMinValue = (TextView) findViewById(R.id.seekbar_min_value);
+		mMaxValue = (TextView) findViewById(R.id.seekbar_max_value);
+		mSeekBar = (SeekBar) findViewById(R.id.seekbar);
 	}
 
 	public void setTitle(CharSequence title) {
@@ -123,7 +123,7 @@ public class CustomSeekBar extends LinearLayout {
 	}
 
 	/**
-	 * ³õÊ¼»¯seekBarÊ±ÉèÖÃProgressÇëÊ¹ÓÃsetProgressTimer
+	 * åˆå§‹åŒ–seekBaræ—¶è®¾ç½®Progressè¯·ä½¿ç”¨setProgressTimer
 	 * @param progress
 	 */
 	public void setProgress(int progress) {
@@ -131,7 +131,7 @@ public class CustomSeekBar extends LinearLayout {
 	}
 
 	/**
-	 * ÆôÓÃ¶¨Ê±Æ÷ÉèÖÃ¸ÃÖµ£¬ÒòÎªViewÔÚ³õÊ¼»¯Ê±²»ÄÜ»îµÄ´óĞ¡
+	 * å¯ç”¨å®šæ—¶å™¨è®¾ç½®è¯¥å€¼ï¼Œå› ä¸ºViewåœ¨åˆå§‹åŒ–æ—¶ä¸èƒ½æ´»çš„å¤§å°
 	 * @param progress
 	 */
 	public void setProgressTimer(final int progress) {

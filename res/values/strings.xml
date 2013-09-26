@@ -1,3 +1,7 @@
 <resources>
 
+    <string name="app_name">Custom View</string>
+    <string name="switch_webview_top_action">Down to the last one</string>
+    <string name="switch_webview_bottom_action">Pull up to the next one</string>
+
 </resources>

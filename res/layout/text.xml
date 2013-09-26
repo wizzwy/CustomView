@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <com.custom.webview.Pull2SwitchWebView
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/pull_2_switch_webview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        custom:bottomActionText="@string/switch_webview_bottom_action"
+        custom:bottomActionTextColor="@android:color/black"
+        custom:bottomBackground="@android:color/darker_gray"
+        custom:bottomIconSrc="@drawable/icon_switch_webview_bottom"
+        custom:bottomTitleText="@string/switch_webview_bottom_action"
+        custom:bottomTitleTextColor="@android:color/black"
+        custom:topActionText="@string/switch_webview_top_action"
+        custom:topActionTextColor="@android:color/black"
+        custom:topBackground="@android:color/darker_gray"
+        custom:topIconSrc="@drawable/icon_switch_webview_top"
+        custom:topTitleText="@string/switch_webview_top_action"
+        custom:topTitleTextColor="@android:color/black" />
+
+</LinearLayout>

@@ -6,7 +6,7 @@
     android:padding="10dip" >
 
     <TextView
-        android:id="@+id/seekBarTitle"
+        android:id="@+id/seekbar_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
@@ -20,7 +20,7 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/seekBarDescription"
+        android:id="@+id/seekbar_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dip"
@@ -28,14 +28,14 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/seekBarValue"
+        android:id="@+id/seekbar_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="2dip"
         android:singleLine="true" />
 
     <SeekBar
-        android:id="@+id/seekBar"
+        android:id="@+id/seekbar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 
@@ -46,14 +46,14 @@
         android:layout_marginTop="5dip" >
 
         <TextView
-            android:id="@+id/seekBarMinValue"
+            android:id="@+id/seekbar_min_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:singleLine="true" />
 
         <TextView
-            android:id="@+id/seekBarMaxValue"
+            android:id="@+id/seekbar_max_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="Pull2SwitchWebView">
+        <attr name="topBackground" format="reference" />
+        <attr name="topBackgroundColor" format="color" />
+        <attr name="topActionText" format="string" />
+        <attr name="topTitleText" format="string" />
+        <attr name="topActionTextColor" format="color" />
+        <attr name="topTitleTextColor" format="color" />
+        <attr name="topIconSrc" format="reference" />
+        <attr name="bottomBackground" format="reference" />
+        <attr name="bottomBackgroundColor" format="color" />
+        <attr name="bottomActionText" format="string" />
+        <attr name="bottomTitleText" format="string" />
+        <attr name="bottomActionTextColor" format="color" />
+        <attr name="bottomTitleTextColor" format="color" />
+        <attr name="bottomIconSrc" format="reference" />
+    </declare-styleable>
+
+</resources>

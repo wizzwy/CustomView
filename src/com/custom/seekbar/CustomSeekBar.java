@@ -52,12 +52,12 @@ public class CustomSeekBar extends LinearLayout {
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.custom_view_seekbar, this, true);
 
-		mTitle = (TextView) findViewById(R.id.seekBarTitle);
-		mDescription = (TextView) findViewById(R.id.seekBarDescription);
-		mValue = (TextView) findViewById(R.id.seekBarValue);
-		mMinValue = (TextView) findViewById(R.id.seekBarMinValue);
-		mMaxValue = (TextView) findViewById(R.id.seekBarMaxValue);
-		mSeekBar = (SeekBar) findViewById(R.id.seekBar);
+		mTitle = (TextView) findViewById(R.id.seekbar_title);
+		mDescription = (TextView) findViewById(R.id.seekbar_description);
+		mValue = (TextView) findViewById(R.id.seekbar_value);
+		mMinValue = (TextView) findViewById(R.id.seekbar_min_value);
+		mMaxValue = (TextView) findViewById(R.id.seekbar_max_value);
+		mSeekBar = (SeekBar) findViewById(R.id.seekbar);
 	}
 
 	public void setTitle(CharSequence title) {

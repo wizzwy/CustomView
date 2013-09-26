@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <declare-styleable name="Pull2SwitchWebView">
-        <attr name="topBackground" format="reference" />
-        <attr name="topBackgroundColor" format="color" />
+        <!-- Top or Bottom 的背景颜色 -->
+        <attr name="topBackground" format="reference|color" />
+        <attr name="bottomBackground" format="reference|color" />
+        <!-- Top or Bottom 的事件描述 -->
         <attr name="topActionText" format="string" />
-        <attr name="topTitleText" format="string" />
-        <attr name="topActionTextColor" format="color" />
-        <attr name="topTitleTextColor" format="color" />
-        <attr name="topIconSrc" format="reference" />
-        <attr name="bottomBackground" format="reference" />
-        <attr name="bottomBackgroundColor" format="color" />
         <attr name="bottomActionText" format="string" />
-        <attr name="bottomTitleText" format="string" />
+        <!-- Top or Bottom 的事件描述文本颜色 -->
+        <attr name="topActionTextColor" format="color" />
         <attr name="bottomActionTextColor" format="color" />
+        <!-- Top or Bottom 的标题 -->
+        <attr name="topTitleText" format="string" />
+        <attr name="bottomTitleText" format="string" />
+        <!-- Top or Bottom 的标题文本颜色 -->
+        <attr name="topTitleTextColor" format="color" />
         <attr name="bottomTitleTextColor" format="color" />
+        <!-- Top or Bottom 的事件图标 -->
+        <attr name="topIconSrc" format="reference" />
         <attr name="bottomIconSrc" format="reference" />
     </declare-styleable>
 

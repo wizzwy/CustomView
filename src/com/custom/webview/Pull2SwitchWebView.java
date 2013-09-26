@@ -8,10 +8,14 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.FloatMath;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,7 +27,7 @@ import android.widget.TextView;
  * @time Create Date: 2013-9-25上午10:34:46
  * @Message: 上下拖拽时切换笔记
  **/
-public class Pull2SwitchWebView extends LinearLayout {
+public class Pull2SwitchWebView extends LinearLayout{
 
 	public Pull2SwitchWebView(Context context) {
 		super(context);
@@ -55,6 +59,10 @@ public class Pull2SwitchWebView extends LinearLayout {
 
 	private int mTopHeight = 0;
 	private int mBottomHeight = 0;
+
+	private RotateAnimation mAnimation;
+	private RotateAnimation mReverseAnimation;
+
 	private void init() {
 		LayoutInflater inflater = (LayoutInflater) getContext()
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -67,7 +75,7 @@ public class Pull2SwitchWebView extends LinearLayout {
 		mBottomIcon = (ImageView) findViewById(R.id.switch_webview_bottom_icon);
 		mBottomAction = (TextView) findViewById(R.id.switch_webview_bottom_action);
 		mBottomTitle = (TextView) findViewById(R.id.switch_webview_bottom_title);
-
+		mWebView = (WebView) findViewById(R.id.switch_webview);
 		//计算控件的高度
 		CustomGlobal.measureView(mTop);
 		CustomGlobal.measureView(mBottom);
@@ -75,130 +83,312 @@ public class Pull2SwitchWebView extends LinearLayout {
 		mBottomHeight = mBottom.getMeasuredHeight();
 
 		//设置padding
-		mTop.setPadding(mTop.getPaddingLeft(), -1 * mTopHeight, mTop.getPaddingRight(), 0);
+		initTopPaddingTop();
 		mTop.invalidate();
 		mTop.setEnabled(false);
-		mBottom.setPadding(mBottom.getPaddingLeft(), 0, mBottom.getPaddingRight(), -1 * mBottomHeight);
+		initBottomPaddingBottom();
 		mBottom.invalidate();
 		mBottom.setEnabled(false);
-		
-		
+
+		mAnimation = new RotateAnimation(0, -180, RotateAnimation.RELATIVE_TO_SELF, 0.5f, RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+		mAnimation.setInterpolator(new LinearInterpolator());
+		mAnimation.setDuration(250);
+		mAnimation.setFillAfter(true);
+		mReverseAnimation = new RotateAnimation(-180, 0, RotateAnimation.RELATIVE_TO_SELF, 0.5f, RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+		mReverseAnimation.setInterpolator(new LinearInterpolator());
+		mReverseAnimation.setDuration(200);
+		mReverseAnimation.setFillAfter(true);
+
+		mState = Pull2SwitchWebViewState.DONE;//默认状态：完成
+	}
+
+	private void initTopPaddingTop() {
+		setTopPaddingTop(-1 * mTopHeight);
+	}
+
+	private void setTopPaddingTop(int top) {
+		mTop.setPadding(mTop.getPaddingLeft(), top, mTop.getPaddingRight(), 0);
+	}
+
+	private void initBottomPaddingBottom() {
+		setBottomPaddingBottom(-1 * mBottomHeight);
+	}
+
+	private void setBottomPaddingBottom(int bottom) {
+		mBottom.setPadding(mBottom.getPaddingLeft(), 0, mBottom.getPaddingRight(), bottom);
 	}
 
 	private void initAttrs(AttributeSet attrs) {
 
 		TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.Pull2SwitchWebView);
-		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_topBackgroundColor)) {
-			setTopBackgroundColor(typedArray.getColor(R.styleable.Pull2SwitchWebView_topBackgroundColor, android.R.color.darker_gray));
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_topBackground)) {
+			Drawable background = typedArray.getDrawable(R.styleable.Pull2SwitchWebView_topBackground);
+			if (background != null)
+				setTopBackground(background);
 		}
-		setTopBackground(typedArray.getDrawable(R.styleable.Pull2SwitchWebView_topBackground));
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_bottomBackground)) {
+			Drawable background = typedArray.getDrawable(R.styleable.Pull2SwitchWebView_bottomBackground);
+			if (background != null)
+				setBackground(background);
+		}
+
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_topActionText)) {
+			String text = typedArray.getString(R.styleable.Pull2SwitchWebView_topActionText);
+			if (!TextUtils.isEmpty(text))
+				setTopActionText(text);
+		}
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_bottomActionText)) {
+			String text = typedArray.getString(R.styleable.Pull2SwitchWebView_bottomActionText);
+			if (!TextUtils.isEmpty(text))
+				setBottomActionText(text);
+		}
+
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_topActionTextColor)) {
+			int color = typedArray.getColor(R.styleable.Pull2SwitchWebView_topActionTextColor, android.R.color.black);
+			setTopActionTextColor(color);
+		}
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_bottomActionTextColor)) {
+			int color = typedArray.getColor(R.styleable.Pull2SwitchWebView_bottomActionTextColor, android.R.color.black);
+			setBottomActionTextColor(color);
+		}
+
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_topTitleText)) {
+			String title = typedArray.getString(R.styleable.Pull2SwitchWebView_topTitleText);
+			if (!TextUtils.isEmpty(title))
+				setTopTitleText(title);
+		}
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_bottomTitleText)) {
+			String title = typedArray.getString(R.styleable.Pull2SwitchWebView_bottomTitleText);
+			if (!TextUtils.isEmpty(title))
+				setBottomTitleText(title);
+		}
+
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_topTitleTextColor)) {
+			int color = typedArray.getColor(R.styleable.Pull2SwitchWebView_topTitleTextColor, android.R.color.black);
+			setTopTitleTextColor(color);
+		}
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_bottomTitleTextColor)) {
+			int color = typedArray.getColor(R.styleable.Pull2SwitchWebView_bottomTitleTextColor, android.R.color.black);
+			setBottomTitleTextColor(color);
+		}
+
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_topIconSrc)) {
+			int icon = typedArray.getResourceId(R.styleable.Pull2SwitchWebView_topIconSrc, R.drawable.icon_switch_webview_top);
+			setTopIconImageResource(icon);
+		}
+		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_bottomIconSrc)) {
+			int resId = typedArray.getResourceId(R.styleable.Pull2SwitchWebView_bottomIconSrc, R.drawable.icon_switch_webview_bottom);
+			setBottomIconImageResource(resId);
+		}
+
 		typedArray.recycle();
 	}
 
-	private enum Pull2SwitchWebViewState{
-		RELEASE_TO_REFRESH, PULL_TO_REFRESH, DONE
+	/**
+	 * DONE:完成，恢复状态；
+	 * PULL_DOWN_2_LAST：向下拉切换上一篇
+	 * RELEASE_2_LAST：松手切换到上一篇
+	 * PULL_UP_2_NEXT：向上拉切换下一篇
+	 * RELEASE_2_NEXT：松手切换到下一篇
+	 */
+	private Pull2SwitchWebViewState mState;//当前状态
+	private enum Pull2SwitchWebViewState {
+		DONE, PULL_DOWN_2_LAST, RELEASE_2_LAST, PULL_UP_2_NEXT, RELEASE_2_NEXT;
 	}
 
+	private float mStartY;//起始的y坐标
+	private boolean mIsRecored;//用于保证startY的值在一个完整的touch事件中只被记录一次
+	private final static int RATIO = 3;//实际的padding的距离与界面上手势偏移距离的比例
+	private boolean mBack;//标识PULL_*_2_*是否从RELEASE_2_*返回的
 	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-//		switch (event.getAction()) {
-//		case MotionEvent.ACTION_DOWN:
-//			if (mFirstItemIndex == 0 && !mIsRecored) {
-//				mIsRecored = true;
-//				mStartY = (int) event.getY();
-//			}
-//			break;
-//
-//		case MotionEvent.ACTION_UP:
-//			if(mState != PullToRefreshListViewState.REFRESHING) {
-//				switch (mState) {
-//				case PULL_TO_REFRESH:
-//					mState = PullToRefreshListViewState.DONE;
-//					//由下拉刷新状态到done状态
-//					changeHeaderViewByState();
-//					break;
-//				case RELEASE_TO_REFRESH:
-//					mState = PullToRefreshListViewState.REFRESHING;
-//					//由松开刷新状态到done状态
-//					changeHeaderViewByState();
-//					onRefresh();
-//					break;
-//				default:
-//					break;
-//				}
-//			}
-//			mIsRecored = false;
-//			mIsBack = false;
-//			break;
-//		case MotionEvent.ACTION_MOVE:
-//			int moveY = (int) event.getY();
-//			if(!mIsRecored && mFirstItemIndex == 0){
-//				mIsRecored = true;
-//				mStartY = moveY;
-//			}
-//			int y = moveY - mStartY;
-//			// &&  y> 100
-//			if(mIsRecored && mState != PullToRefreshListViewState.REFRESHING){
-//				//保证在设置padding的过程中，当前的位置一直实在head，否则如果当列表超出屏幕的话，当在上推的时候，列表会同时进行滚动
-//				//可以松手去刷新了
-//				if(mState == PullToRefreshListViewState.RELEASE_TO_REFRESH) {
-//					setSelection(0);//指定选定的位置 headView
-//					
-//					//往上推了，推到了屏幕足够掩盖head的程度，但是还没有推到全部掩盖的地步
-//					if((y / RATIO < mHeadContentHeight ) && y > 0){
-//						//由松开刷新状态转变到下拉刷新状态
-//						mState = PullToRefreshListViewState.PULL_TO_REFRESH;
-//						changeHeaderViewByState();
-//					}
-//					//一下子推到顶了
-//					else if(y <= 0){
-//						//由松开刷新状态转变到done状态
-//						mState = PullToRefreshListViewState.DONE;
-//						changeHeaderViewByState();
-//					}
-//					//往下拉了，或者还没有上推到屏幕顶部掩盖head的地步
-//					else {
-//						//不用进行特别的操作，只用更新paddingTop的值就行了
-//						mHeadView.setPadding(0, y / RATIO - mHeadContentHeight, 0, 0);
-//					}
-//				}
-//				
-//				//还没有到达显示松开刷新的时候，DONE或者是PULL_TO_REFRESH状态
-//				if(mState == PullToRefreshListViewState.PULL_TO_REFRESH){
-//					setSelection(0);
-//					
-//					//下拉到可以进入RELEASE_TO_REFRESH的状体
-//					if(y / RATIO >= mHeadContentHeight ){
-//						//由DONE或者下拉刷新状态 转变到松开刷新
-//						mState = PullToRefreshListViewState.RELEASE_TO_REFRESH;
-//						mIsBack = true;
-//						changeHeaderViewByState();
-//					}
-//					//上推到顶了
-//					else if(y <= 0){
-//						//由DONE或者下拉刷新状态转变到DONE状态
-//						mState = PullToRefreshListViewState.DONE;
-//						changeHeaderViewByState();
-//					}
-//				}
-//				
-//				//DONE状态下
-//				if(mState == PullToRefreshListViewState.DONE) {
-//					if(y > 0){
-//						//由DONE状态转变到下拉刷新状态
-//						mState = PullToRefreshListViewState.PULL_TO_REFRESH;
-//						changeHeaderViewByState();
-//					}
-//				}
-//				//更新headView的size
-//				if(mState == PullToRefreshListViewState.PULL_TO_REFRESH) {
-//					mHeadView.setPadding(0, -1 * mHeadContentHeight + y / RATIO, 0, 0);
-//					
-//				}
-//			}
-//			break;
-//		}
-		return super.onTouchEvent(event);
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			initEventStartData(event);
+			break;
+
+		case MotionEvent.ACTION_UP:
+			switch (mState) {
+			case PULL_DOWN_2_LAST:
+				break;
+			case RELEASE_2_LAST:
+				mOnPullListener.onPullDownFromTop();
+				break;
+			case PULL_UP_2_NEXT:
+				break;
+			case RELEASE_2_NEXT:
+				mOnPullListener.onPullUpFromBottom();
+				break;
+			default:
+				break;
+			}
+			mBack = false;
+			mIsRecored = false;
+			if (mState == Pull2SwitchWebViewState.DONE)
+				break;
+			//切换状态到done，并刷新View
+			mState = Pull2SwitchWebViewState.DONE;
+			refreshAdditionalViewByState(mState);
+			break;
+		case MotionEvent.ACTION_MOVE:
+			initEventStartData(event);
+			if(!mIsRecored)
+				break;
+			float endY = event.getY();
+			float moveY = endY - mStartY;
+
+			//DONE状态下
+			if(mState == Pull2SwitchWebViewState.DONE) {
+				if(moveY > 5){//由DONE状态转变到下拉上一篇状态
+					mState = Pull2SwitchWebViewState.PULL_DOWN_2_LAST;
+				}else if (moveY < -5) {//由DONE状态转变到上拉下一篇状态
+					mState = Pull2SwitchWebViewState.PULL_UP_2_NEXT;
+				}
+				refreshAdditionalView(mState, Pull2SwitchWebViewState.DONE);
+			}
+
+			if(mState == Pull2SwitchWebViewState.PULL_DOWN_2_LAST){
+
+				if(moveY / RATIO >= mTopHeight){//下拉到可以进入RELEASE_2_LAST的状体，下拉上一篇状态转变到松开上一篇状态
+					mState = Pull2SwitchWebViewState.RELEASE_2_LAST;
+				} else if(moveY <= 0){//上推到顶了，下拉上一篇状态转变到DONE状态
+					mState = Pull2SwitchWebViewState.DONE;
+				}
+
+				refreshAdditionalView(mState, Pull2SwitchWebViewState.PULL_DOWN_2_LAST);
+			}
+
+			//
+			if(mState == Pull2SwitchWebViewState.RELEASE_2_LAST) {
+
+				if(((moveY / RATIO) < mTopHeight) && moveY > 0){//往上推到了屏幕已掩盖部分head,松开上一篇状态转变到下拉上一篇状态
+					mState = Pull2SwitchWebViewState.PULL_DOWN_2_LAST;
+					mBack = true;
+				} else if(moveY <= 0){//直接推到顶，松开上一篇状态转变到done状态
+					mState = Pull2SwitchWebViewState.DONE;
+				}
+
+				refreshAdditionalView(mState, Pull2SwitchWebViewState.RELEASE_2_LAST);
+			}
+
+			// /////////////////////////////////////////////////////////////////////////////////////////////////////////
+			float oppositeMoveY = -1 * moveY;
+			if (mState == Pull2SwitchWebViewState.PULL_UP_2_NEXT) {
+
+				if (oppositeMoveY / RATIO >= mBottomHeight) {// 上拉到可以进入RELEASE_2_NEXT的状体，上拉下一篇状态转变到松开下一篇状态
+					mState = Pull2SwitchWebViewState.RELEASE_2_NEXT;
+				} else if (oppositeMoveY <= 0) {// 下推至底，上拉下一篇状态转变到DONE状态
+					mState = Pull2SwitchWebViewState.DONE;
+				}
+
+				refreshAdditionalView(mState, Pull2SwitchWebViewState.PULL_UP_2_NEXT);
+			}
+
+			//
+			if (mState == Pull2SwitchWebViewState.RELEASE_2_NEXT) {
+
+				if (((oppositeMoveY / RATIO) < mTopHeight) && oppositeMoveY > 0) {// 向下推到了屏幕已掩盖部分Bottom,松开下一篇状态转变到上拉下一篇状态
+					mState = Pull2SwitchWebViewState.PULL_UP_2_NEXT;
+					mBack = true;
+				} else if (oppositeMoveY <= 0) {// 直接推到底，松开下一篇状态转变到done状态
+					mState = Pull2SwitchWebViewState.DONE;
+				}
+
+				refreshAdditionalView(mState, Pull2SwitchWebViewState.RELEASE_2_NEXT);
+			}
+
+			//更新padding
+			switch (mState) {
+			case DONE:
+				initTopPaddingTop();
+				initBottomPaddingBottom();
+				break;
+			case PULL_DOWN_2_LAST:
+			case RELEASE_2_LAST:
+				int top = (int) ((-1 * mTopHeight) +  moveY / RATIO);
+				setTopPaddingTop(top);
+				initBottomPaddingBottom();
+				break;
+			case PULL_UP_2_NEXT:
+			case RELEASE_2_NEXT:
+				int bottom = (int) ((-1 * mBottomHeight) - (moveY / RATIO));
+				initTopPaddingTop();
+				setBottomPaddingBottom(bottom);
+				break;
+
+			default:
+				break;
+			}
+			break;
+		}
+		return super.dispatchTouchEvent(event);
+	}
+
+	private void initEventStartData(MotionEvent event){
+		if (isReadyForPull() && !mIsRecored) {
+			mStartY = event.getY();
+			mIsRecored = true;
+		}
+	}
+
+	private boolean isReadyForPull() {
+		return isReadyForPullFromStart() || isReadyForPullFromEnd();
+	}
+
+	private boolean isReadyForPullFromStart() {
+		return mWebView.getScrollY() <= 0;
+	}
+
+	@SuppressWarnings("deprecation")
+	private boolean isReadyForPullFromEnd() {
+		float exactContentHeight = FloatMath.floor(mWebView.getContentHeight() * mWebView.getScale());
+		return mWebView.getScrollY() >= (exactContentHeight - mWebView.getHeight());
+	}
+	
+	private void refreshAdditionalView(Pull2SwitchWebViewState state, Pull2SwitchWebViewState currentState){
+		if (state == currentState) 
+			return;
+		refreshAdditionalViewByState(state);
+	}
+
+	// 当状态改变时候，调用该方法，以更新界面
+	private void refreshAdditionalViewByState(Pull2SwitchWebViewState state) {
+		switch (state) {
+		case PULL_DOWN_2_LAST:
+			if (mBack) {
+				mBack = false;
+				mTopIcon.clearAnimation();
+				mTopIcon.startAnimation(mReverseAnimation);
+			}
+			break;
+		case PULL_UP_2_NEXT:
+			if (mBack) {
+				mBack = false;
+				mBottomIcon.clearAnimation();
+				mBottomIcon.startAnimation(mReverseAnimation);
+			}
+			break;
+		case RELEASE_2_LAST:
+			mTopIcon.clearAnimation();
+			mTopIcon.startAnimation(mAnimation);
+			break;
+		case RELEASE_2_NEXT:
+			mBottomIcon.clearAnimation();
+			mBottomIcon.startAnimation(mAnimation);
+			break;
+		case DONE://当前状态，done
+			initTopPaddingTop();
+			initBottomPaddingBottom();
+			mTopIcon.clearAnimation();
+			mBottomIcon.clearAnimation();
+			reSetTopIconImageResource();
+			reSetBottomIconImageResource();
+			mTopIcon.setImageDrawable(mTopIcon.getDrawable());
+			mBottomIcon.setImageDrawable(mBottomIcon.getDrawable());
+			break;
+		default:
+			break;
+		}
 	}
 
 	/**
@@ -233,7 +423,20 @@ public class Pull2SwitchWebView extends LinearLayout {
 	 * @param resId
 	 */
 	public void setTopIconImageResource(int resId) {
+		mTopIconResourceId = resId;
 		mTopIcon.setImageResource(resId);
+	}
+
+	private int mTopIconResourceId = 0;
+	/**
+	 * 重新设置top的图标标识
+	 * 
+	 * @param resId
+	 */
+	public void reSetTopIconImageResource() {
+		if (mTopIconResourceId == 0)
+			mTopIconResourceId = R.drawable.icon_switch_webview_top;
+		setTopIconImageResource(mTopIconResourceId);
 	}
 
 	/**
@@ -333,6 +536,18 @@ public class Pull2SwitchWebView extends LinearLayout {
 		mBottomIcon.setImageResource(resId);
 	}
 
+	private int mBottomIconResource = 0;
+	/**
+	 * 重新设置bottom的图标标识
+	 * 
+	 * @param resId
+	 */
+	public void reSetBottomIconImageResource() {
+		if (mBottomIconResource == 0)
+			mBottomIconResource = R.drawable.icon_switch_webview_bottom;
+		setBottomIconImageResource(mBottomIconResource);
+	}
+
 	/**
 	 * 设置Action的字体颜色
 	 * 
@@ -402,4 +617,13 @@ public class Pull2SwitchWebView extends LinearLayout {
 		return mWebView;
 	}
 
+	private OnPullListener mOnPullListener;
+	public void setOnPullListener(OnPullListener listener){
+		mOnPullListener = listener;
+	}
+
+	public static interface OnPullListener{
+		public void onPullDownFromTop();
+		public void onPullUpFromBottom();
+	}
 }

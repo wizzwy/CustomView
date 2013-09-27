@@ -7,5 +7,7 @@
     <color name="blue">#0000FF</color>
     <color name="gray">#808080</color>
     <color name="darkgray">#bebebe</color>
-
+	<color name="text_color_switch_webview_action">#B5B6B6</color>
+	<color name="text_color_switch_webview_title">#929292</color>
+	<color name="background_switch_webview_pull_view">#E6E6E6</color>
 </resources>

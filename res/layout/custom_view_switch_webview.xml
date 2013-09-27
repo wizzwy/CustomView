@@ -9,7 +9,7 @@
         android:id="@+id/switch_webview_top"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/darker_gray"
+        android:background="@color/background_switch_webview_pull_view"
         android:gravity="center_vertical"
         android:orientation="horizontal" >
 
@@ -17,37 +17,38 @@
             android:id="@+id/switch_webview_top_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dip"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="4dip"
             android:contentDescription="@string/app_name"
             android:src="@drawable/icon_switch_webview_top" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dip"
             android:gravity="center_vertical"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:padding="0dip" >
 
             <TextView
                 android:id="@+id/switch_webview_top_action"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:layout_marginTop="5dip"
+                android:padding="0dip"
                 android:singleLine="true"
                 android:text="@string/switch_webview_top_action"
-                android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                android:textColor="@color/text_color_switch_webview_action"
+                android:textSize="10dip" />
 
             <TextView
                 android:id="@+id/switch_webview_top_title"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
+                android:layout_marginTop="4dip"
+                android:padding="0dip"
                 android:singleLine="true"
                 android:text="@string/switch_webview_bottom_action"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+                android:textColor="@color/text_color_switch_webview_title"
+                android:textSize="12dip" />
         </LinearLayout>
     </LinearLayout>
 
@@ -64,7 +65,7 @@
         android:id="@+id/switch_webview_bottom"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/darker_gray"
+        android:background="@color/background_switch_webview_pull_view"
         android:gravity="center_vertical"
         android:orientation="horizontal" >
 
@@ -72,37 +73,38 @@
             android:id="@+id/switch_webview_bottom_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dip"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="4dip"
             android:contentDescription="@string/app_name"
             android:src="@drawable/icon_switch_webview_bottom" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dip"
             android:gravity="center_vertical"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:padding="0dip" >
 
             <TextView
                 android:id="@+id/switch_webview_bottom_action"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:layout_marginTop="5dip"
+                android:padding="0dip"
                 android:singleLine="true"
                 android:text="@string/switch_webview_bottom_action"
-                android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                android:textColor="@color/text_color_switch_webview_action"
+                android:textSize="10dip" />
 
             <TextView
                 android:id="@+id/switch_webview_bottom_title"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
+                android:layout_marginTop="4dip"
+                android:padding="0dip"
                 android:singleLine="true"
                 android:text="@string/switch_webview_top_action"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+                android:textColor="@color/text_color_switch_webview_title"
+                android:textSize="12dip" />
         </LinearLayout>
     </LinearLayout>
 

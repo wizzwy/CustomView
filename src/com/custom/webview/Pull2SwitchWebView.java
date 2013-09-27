@@ -366,7 +366,7 @@ public class Pull2SwitchWebView extends LinearLayout{
 	}
 
 	private void refreshScrollDirection(MotionEvent start, MotionEvent end) {
-		if (Math.abs(end.getY() - start.getY()) > 5) {
+		if (Math.abs(end.getY() - start.getY()) < 5) {
 			mScrollDirection = ScrollDirection.NULL;
 			return;
 		}
@@ -376,12 +376,12 @@ public class Pull2SwitchWebView extends LinearLayout{
 		case TOP:
 		case TOP_LEFT:
 		case TOP_RIGHT:
-			mScrollDirection = ScrollDirection.TOP_2_BOTTOM;
+			mScrollDirection = ScrollDirection.BOTTOM_2_TOP;
 			break;
 		case BOTTOM:
 		case BOTTOM_LEFT:
 		case BOTTOM_RIGHT:
-			mScrollDirection = ScrollDirection.BOTTOM_2_TOP;
+			mScrollDirection = ScrollDirection.TOP_2_BOTTOM;
 			break;
 		default:
 			break;

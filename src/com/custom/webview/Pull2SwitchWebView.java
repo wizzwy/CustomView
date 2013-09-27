@@ -200,6 +200,7 @@ public class Pull2SwitchWebView extends LinearLayout{
 	private final static int RATIO = 3;//实际的padding的距离与界面上手势偏移距离的比例
 	private boolean mBack;//标识PULL_*_2_*是否从RELEASE_2_*返回的
 	private MotionEvent mOldEvent;
+	@SuppressLint("Recycle")
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		switch (event.getAction()) {
@@ -232,7 +233,6 @@ public class Pull2SwitchWebView extends LinearLayout{
 			refreshAdditionalViewByState(mState);
 			break;
 		case MotionEvent.ACTION_MOVE:
-			refreshScrollDirection(mOldEvent, event);
 			initEventStartData(event);
 			if(!mIsRecored)
 				break;
@@ -327,6 +327,7 @@ public class Pull2SwitchWebView extends LinearLayout{
 	}
 
 	private void initEventStartData(MotionEvent event){
+		refreshScrollDirection(mOldEvent, event);//判断滑动方向
 		if (isReadyForPull() && !mIsRecored) {
 			mStartY = event.getY();
 			mIsRecored = true;
@@ -339,27 +340,37 @@ public class Pull2SwitchWebView extends LinearLayout{
 	}
 
 	private boolean isReadyForPullFromStart() {
+		if (mScrollDirection != ScrollDirection.TOP_2_BOTTOM)
+			return false;
 		float scrolly = mWebView.getScrollY();
-		return scrolly <= 0 && mScrollDirection == ScrollDirection.TOP_2_BOTTOM;
+		return scrolly <= 0;
 	}
 
 	@SuppressWarnings("deprecation")
 	private boolean isReadyForPullFromEnd() {
+		if (mScrollDirection != ScrollDirection.BOTTOM_2_TOP)
+			return false;
+
 		float scale = mWebView.getScale();
 		float contentHeight = mWebView.getContentHeight();
 		float height = mWebView.getHeight();
 		float scrolly = mWebView.getScrollY();
 
 		float exactContentHeight = FloatMath.floor(contentHeight * scale);
-		return scrolly >= (exactContentHeight - height) && mScrollDirection == ScrollDirection.BOTTOM_2_TOP;
+		return scrolly >= (exactContentHeight - height);
 	}
 
 	private ScrollDirection mScrollDirection;
 	private enum ScrollDirection{
 		NULL, TOP_2_BOTTOM, BOTTOM_2_TOP;
 	}
-	
-	private void refreshScrollDirection(MotionEvent start, MotionEvent end){
+
+	private void refreshScrollDirection(MotionEvent start, MotionEvent end) {
+		if (Math.abs(end.getY() - start.getY()) > 5) {
+			mScrollDirection = ScrollDirection.NULL;
+			return;
+		}
+
 		GesttureDirection direction = CustomGlobal.getGesttureDirection(start, end);
 		switch (direction) {
 		case TOP:
@@ -376,7 +387,7 @@ public class Pull2SwitchWebView extends LinearLayout{
 			break;
 		}
 	}
-	
+
 	private void refreshAdditionalView(Pull2SwitchWebViewState state, Pull2SwitchWebViewState currentState){
 		if (state == currentState) 
 			return;

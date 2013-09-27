@@ -1,6 +1,7 @@
 package com.custom.webview;
 
 import com.custom.CustomGlobal;
+import com.custom.CustomGlobal.GesttureDirection;
 import com.custom.R;
 
 import android.annotation.SuppressLint;
@@ -122,14 +123,12 @@ public class Pull2SwitchWebView extends LinearLayout{
 
 		TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.Pull2SwitchWebView);
 		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_topBackground)) {
-			Drawable background = typedArray.getDrawable(R.styleable.Pull2SwitchWebView_topBackground);
-			if (background != null)
-				setTopBackground(background);
+			int resId = typedArray.getResourceId(R.styleable.Pull2SwitchWebView_topBackground, android.R.color.darker_gray);
+			setTopBackground(resId);
 		}
 		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_bottomBackground)) {
-			Drawable background = typedArray.getDrawable(R.styleable.Pull2SwitchWebView_bottomBackground);
-			if (background != null)
-				setBackground(background);
+			int resId = typedArray.getResourceId(R.styleable.Pull2SwitchWebView_bottomBackground, android.R.color.darker_gray);
+			setBottomBackground(resId);
 		}
 
 		if (typedArray.hasValue(R.styleable.Pull2SwitchWebView_topActionText)) {
@@ -200,11 +199,13 @@ public class Pull2SwitchWebView extends LinearLayout{
 	private boolean mIsRecored;//用于保证startY的值在一个完整的touch事件中只被记录一次
 	private final static int RATIO = 3;//实际的padding的距离与界面上手势偏移距离的比例
 	private boolean mBack;//标识PULL_*_2_*是否从RELEASE_2_*返回的
+	private MotionEvent mOldEvent;
+	@SuppressLint("Recycle")
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			initEventStartData(event);
+			mOldEvent = MotionEvent.obtain(event);
 			break;
 
 		case MotionEvent.ACTION_UP:
@@ -224,6 +225,7 @@ public class Pull2SwitchWebView extends LinearLayout{
 			}
 			mBack = false;
 			mIsRecored = false;
+			mScrollDirection = ScrollDirection.NULL;
 			if (mState == Pull2SwitchWebViewState.DONE)
 				break;
 			//切换状态到done，并刷新View
@@ -325,9 +327,11 @@ public class Pull2SwitchWebView extends LinearLayout{
 	}
 
 	private void initEventStartData(MotionEvent event){
+		refreshScrollDirection(mOldEvent, event);//判断滑动方向
 		if (isReadyForPull() && !mIsRecored) {
 			mStartY = event.getY();
 			mIsRecored = true;
+			mScrollDirection = ScrollDirection.NULL;
 		}
 	}
 
@@ -336,15 +340,54 @@ public class Pull2SwitchWebView extends LinearLayout{
 	}
 
 	private boolean isReadyForPullFromStart() {
-		return mWebView.getScrollY() <= 0;
+		if (mScrollDirection != ScrollDirection.TOP_2_BOTTOM)
+			return false;
+		float scrolly = mWebView.getScrollY();
+		return scrolly <= 0;
 	}
 
 	@SuppressWarnings("deprecation")
 	private boolean isReadyForPullFromEnd() {
-		float exactContentHeight = FloatMath.floor(mWebView.getContentHeight() * mWebView.getScale());
-		return mWebView.getScrollY() >= (exactContentHeight - mWebView.getHeight());
+		if (mScrollDirection != ScrollDirection.BOTTOM_2_TOP)
+			return false;
+
+		float scale = mWebView.getScale();
+		float contentHeight = mWebView.getContentHeight();
+		float height = mWebView.getHeight();
+		float scrolly = mWebView.getScrollY();
+
+		float exactContentHeight = FloatMath.floor(contentHeight * scale);
+		return scrolly >= (exactContentHeight - height);
 	}
-	
+
+	private ScrollDirection mScrollDirection;
+	private enum ScrollDirection{
+		NULL, TOP_2_BOTTOM, BOTTOM_2_TOP;
+	}
+
+	private void refreshScrollDirection(MotionEvent start, MotionEvent end) {
+		if (Math.abs(end.getY() - start.getY()) < 5) {
+			mScrollDirection = ScrollDirection.NULL;
+			return;
+		}
+
+		GesttureDirection direction = CustomGlobal.getGesttureDirection(start, end);
+		switch (direction) {
+		case TOP:
+		case TOP_LEFT:
+		case TOP_RIGHT:
+			mScrollDirection = ScrollDirection.BOTTOM_2_TOP;
+			break;
+		case BOTTOM:
+		case BOTTOM_LEFT:
+		case BOTTOM_RIGHT:
+			mScrollDirection = ScrollDirection.TOP_2_BOTTOM;
+			break;
+		default:
+			break;
+		}
+	}
+
 	private void refreshAdditionalView(Pull2SwitchWebViewState state, Pull2SwitchWebViewState currentState){
 		if (state == currentState) 
 			return;

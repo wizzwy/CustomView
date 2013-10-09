@@ -200,142 +200,162 @@ public class Pull2SwitchWebView extends LinearLayout{
 	private final static int RATIO = 3;//实际的padding的距离与界面上手势偏移距离的比例
 	private boolean mBack;//标识PULL_*_2_*是否从RELEASE_2_*返回的
 	private MotionEvent mOldEvent;
-	@SuppressLint("Recycle")
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			mOldEvent = MotionEvent.obtain(event);
+			dispatchTouchEventDown(event);
 			break;
-
 		case MotionEvent.ACTION_UP:
-			switch (mState) {
-			case PULL_DOWN_2_LAST:
-				break;
-			case RELEASE_2_LAST:
-				mOnPullListener.onPullDownFromTop();
-				break;
-			case PULL_UP_2_NEXT:
-				break;
-			case RELEASE_2_NEXT:
-				mOnPullListener.onPullUpFromBottom();
-				break;
-			default:
-				break;
-			}
-			mBack = false;
-			mIsRecored = false;
-			mScrollDirection = ScrollDirection.NULL;
-			if (mState == Pull2SwitchWebViewState.DONE)
-				break;
-			//切换状态到done，并刷新View
-			mState = Pull2SwitchWebViewState.DONE;
-			refreshAdditionalViewByState(mState);
+			dispatchTouchEventUp(event);
 			break;
 		case MotionEvent.ACTION_MOVE:
-			initEventStartData(event);
-			if(!mIsRecored)
-				break;
-			float endY = event.getY();
-			float moveY = endY - mStartY;
-
-			//DONE状态下
-			if(mState == Pull2SwitchWebViewState.DONE) {
-				if(moveY > 5){//由DONE状态转变到下拉上一篇状态
-					mState = Pull2SwitchWebViewState.PULL_DOWN_2_LAST;
-				}else if (moveY < -5) {//由DONE状态转变到上拉下一篇状态
-					mState = Pull2SwitchWebViewState.PULL_UP_2_NEXT;
-				}
-				refreshAdditionalView(mState, Pull2SwitchWebViewState.DONE);
-			}
-
-			if(mState == Pull2SwitchWebViewState.PULL_DOWN_2_LAST){
-
-				if(moveY / RATIO >= mTopHeight){//下拉到可以进入RELEASE_2_LAST的状体，下拉上一篇状态转变到松开上一篇状态
-					mState = Pull2SwitchWebViewState.RELEASE_2_LAST;
-				} else if(moveY <= 0){//上推到顶了，下拉上一篇状态转变到DONE状态
-					mState = Pull2SwitchWebViewState.DONE;
-				}
-
-				refreshAdditionalView(mState, Pull2SwitchWebViewState.PULL_DOWN_2_LAST);
-			}
-
-			//
-			if(mState == Pull2SwitchWebViewState.RELEASE_2_LAST) {
-
-				if(((moveY / RATIO) < mTopHeight) && moveY > 0){//往上推到了屏幕已掩盖部分head,松开上一篇状态转变到下拉上一篇状态
-					mState = Pull2SwitchWebViewState.PULL_DOWN_2_LAST;
-					mBack = true;
-				} else if(moveY <= 0){//直接推到顶，松开上一篇状态转变到done状态
-					mState = Pull2SwitchWebViewState.DONE;
-				}
-
-				refreshAdditionalView(mState, Pull2SwitchWebViewState.RELEASE_2_LAST);
-			}
-
-			// /////////////////////////////////////////////////////////////////////////////////////////////////////////
-			float oppositeMoveY = -1 * moveY;
-			if (mState == Pull2SwitchWebViewState.PULL_UP_2_NEXT) {
-
-				if (oppositeMoveY / RATIO >= mBottomHeight) {// 上拉到可以进入RELEASE_2_NEXT的状体，上拉下一篇状态转变到松开下一篇状态
-					mState = Pull2SwitchWebViewState.RELEASE_2_NEXT;
-				} else if (oppositeMoveY <= 0) {// 下推至底，上拉下一篇状态转变到DONE状态
-					mState = Pull2SwitchWebViewState.DONE;
-				}
-
-				refreshAdditionalView(mState, Pull2SwitchWebViewState.PULL_UP_2_NEXT);
-			}
-
-			//
-			if (mState == Pull2SwitchWebViewState.RELEASE_2_NEXT) {
-
-				if (((oppositeMoveY / RATIO) < mTopHeight) && oppositeMoveY > 0) {// 向下推到了屏幕已掩盖部分Bottom,松开下一篇状态转变到上拉下一篇状态
-					mState = Pull2SwitchWebViewState.PULL_UP_2_NEXT;
-					mBack = true;
-				} else if (oppositeMoveY <= 0) {// 直接推到底，松开下一篇状态转变到done状态
-					mState = Pull2SwitchWebViewState.DONE;
-				}
-
-				refreshAdditionalView(mState, Pull2SwitchWebViewState.RELEASE_2_NEXT);
-			}
-
-			//更新padding
-			switch (mState) {
-			case DONE:
-				initTopPaddingTop();
-				initBottomPaddingBottom();
-				break;
-			case PULL_DOWN_2_LAST:
-			case RELEASE_2_LAST:
-				int top = (int) ((-1 * mTopHeight) +  moveY / RATIO);
-				setTopPaddingTop(top);
-				initBottomPaddingBottom();
-				break;
-			case PULL_UP_2_NEXT:
-			case RELEASE_2_NEXT:
-				int bottom = (int) ((-1 * mBottomHeight) - (moveY / RATIO));
-				initTopPaddingTop();
-				setBottomPaddingBottom(bottom);
-				break;
-
-			default:
-				break;
-			}
+			dispatchTouchEventMove(event);
 			break;
 		}
 		return super.dispatchTouchEvent(event);
 	}
 
+	/**
+	 * dispatchTouchEvent down事件
+	 */
+	@SuppressLint("Recycle")
+	private void dispatchTouchEventDown(MotionEvent event) {
+		mOldEvent = MotionEvent.obtain(event);
+	}
+
+	/**
+	 * dispatchTouchEvent up事件
+	 */
+	private void dispatchTouchEventUp(MotionEvent event) {
+		switch (mState) {
+		case PULL_DOWN_2_LAST:
+			break;
+		case RELEASE_2_LAST:
+			mOnPullListener.onPullDownFromTop();
+			break;
+		case PULL_UP_2_NEXT:
+			break;
+		case RELEASE_2_NEXT:
+			mOnPullListener.onPullUpFromBottom();
+			break;
+		default:
+			break;
+		}
+		mBack = false;
+		mIsRecored = false;
+		mScrollDirection = ScrollDirection.NULL;
+		if (mState == Pull2SwitchWebViewState.DONE)
+			return;
+		//切换状态到done，并刷新View
+		mState = Pull2SwitchWebViewState.DONE;
+		refreshAdditionalViewByState(mState);
+	}
+
+	/**
+	 * dispatchTouchEvent move事件
+	 */
+	private void dispatchTouchEventMove(MotionEvent event) {
+		initEventStartData(event);
+		if(!mIsRecored)
+			return;
+		float endY = event.getY();
+		float moveY = endY - mStartY;
+
+		//DONE状态下
+		if(mState == Pull2SwitchWebViewState.DONE) {
+			if(moveY > 5){//由DONE状态转变到下拉上一篇状态
+				mState = Pull2SwitchWebViewState.PULL_DOWN_2_LAST;
+			}else if (moveY < -5) {//由DONE状态转变到上拉下一篇状态
+				mState = Pull2SwitchWebViewState.PULL_UP_2_NEXT;
+			}
+			refreshAdditionalView(mState, Pull2SwitchWebViewState.DONE);
+		}
+
+		if(mState == Pull2SwitchWebViewState.PULL_DOWN_2_LAST){
+
+			if(moveY / RATIO >= mTopHeight){//下拉到可以进入RELEASE_2_LAST的状体，下拉上一篇状态转变到松开上一篇状态
+				mState = Pull2SwitchWebViewState.RELEASE_2_LAST;
+			} else if(moveY <= 0){//上推到顶了，下拉上一篇状态转变到DONE状态
+				mState = Pull2SwitchWebViewState.DONE;
+			}
+
+			refreshAdditionalView(mState, Pull2SwitchWebViewState.PULL_DOWN_2_LAST);
+		}
+
+		//
+		if(mState == Pull2SwitchWebViewState.RELEASE_2_LAST) {
+
+			if(((moveY / RATIO) < mTopHeight) && moveY > 0){//往上推到了屏幕已掩盖部分head,松开上一篇状态转变到下拉上一篇状态
+				mState = Pull2SwitchWebViewState.PULL_DOWN_2_LAST;
+				mBack = true;
+			} else if(moveY <= 0){//直接推到顶，松开上一篇状态转变到done状态
+				mState = Pull2SwitchWebViewState.DONE;
+			}
+
+			refreshAdditionalView(mState, Pull2SwitchWebViewState.RELEASE_2_LAST);
+		}
+
+		// /////////////////////////////////////////////////////////////////////////////////////////////////////////
+		float oppositeMoveY = -1 * moveY;
+		if (mState == Pull2SwitchWebViewState.PULL_UP_2_NEXT) {
+
+			if (oppositeMoveY / RATIO >= mBottomHeight) {// 上拉到可以进入RELEASE_2_NEXT的状体，上拉下一篇状态转变到松开下一篇状态
+				mState = Pull2SwitchWebViewState.RELEASE_2_NEXT;
+			} else if (oppositeMoveY <= 0) {// 下推至底，上拉下一篇状态转变到DONE状态
+				mState = Pull2SwitchWebViewState.DONE;
+			}
+
+			refreshAdditionalView(mState, Pull2SwitchWebViewState.PULL_UP_2_NEXT);
+		}
+
+		//
+		if (mState == Pull2SwitchWebViewState.RELEASE_2_NEXT) {
+
+			if (((oppositeMoveY / RATIO) < mTopHeight) && oppositeMoveY > 0) {// 向下推到了屏幕已掩盖部分Bottom,松开下一篇状态转变到上拉下一篇状态
+				mState = Pull2SwitchWebViewState.PULL_UP_2_NEXT;
+				mBack = true;
+			} else if (oppositeMoveY <= 0) {// 直接推到底，松开下一篇状态转变到done状态
+				mState = Pull2SwitchWebViewState.DONE;
+			}
+
+			refreshAdditionalView(mState, Pull2SwitchWebViewState.RELEASE_2_NEXT);
+		}
+
+		//更新padding
+		switch (mState) {
+		case DONE:
+			initTopPaddingTop();
+			initBottomPaddingBottom();
+			break;
+		case PULL_DOWN_2_LAST:
+		case RELEASE_2_LAST:
+			int top = (int) ((-1 * mTopHeight) +  moveY / RATIO);
+			setTopPaddingTop(top);
+			initBottomPaddingBottom();
+			break;
+		case PULL_UP_2_NEXT:
+		case RELEASE_2_NEXT:
+			int bottom = (int) ((-1 * mBottomHeight) - (moveY / RATIO));
+			initTopPaddingTop();
+			setBottomPaddingBottom(bottom);
+			break;
+
+		default:
+			break;
+		}
+	}
+
 	private void initEventStartData(MotionEvent event){
-		refreshScrollDirection(mOldEvent, event);//判断滑动方向
-		if (isReadyForPull() && !mIsRecored) {
+		if (!mIsRecored && isReadyForPull(event)) {
 			mStartY = event.getY();
 			mIsRecored = true;
 			mScrollDirection = ScrollDirection.NULL;
 		}
 	}
 
-	private boolean isReadyForPull() {
+	private boolean isReadyForPull(MotionEvent event) {
+		refreshScrollDirection(mOldEvent, event);//判断滑动方向
 		return isReadyForPullFromStart() || isReadyForPullFromEnd();
 	}
 
@@ -456,6 +476,7 @@ public class Pull2SwitchWebView extends LinearLayout{
 		mTop.setBackgroundResource(resid);
 	}
 
+	@SuppressLint("NewApi")
 	public void setTopBackground(Drawable background) {
 		mTop.setBackground(background);
 	}
@@ -566,6 +587,7 @@ public class Pull2SwitchWebView extends LinearLayout{
 		mBottom.setBackgroundResource(resid);
 	}
 
+	@SuppressLint("NewApi")
 	public void setBottomBackground(Drawable background) {
 		mBottom.setBackground(background);
 	}

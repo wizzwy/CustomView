@@ -30,6 +30,8 @@ import android.widget.TextView;
  **/
 public class Pull2SwitchWebView extends LinearLayout{
 
+	protected static final String LOG_TAG = "Pull2SwitchWebView";
+	
 	public Pull2SwitchWebView(Context context) {
 		super(context);
 		init();
@@ -200,14 +202,23 @@ public class Pull2SwitchWebView extends LinearLayout{
 	private final static int RATIO = 3;//实际的padding的距离与界面上手势偏移距离的比例
 	private boolean mBack;//标识PULL_*_2_*是否从RELEASE_2_*返回的
 	private MotionEvent mOldEvent;
+	@SuppressLint("InlinedApi")
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
-		switch (event.getAction()) {
+		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
 			dispatchTouchEventDown(event);
 			break;
+		case MotionEvent.ACTION_POINTER_DOWN:
+			if (mOnPointerPullListener != null)
+				mOnPointerPullListener.onPointerDown(event);
+			break;
 		case MotionEvent.ACTION_UP:
 			dispatchTouchEventUp(event);
+			break;
+		case MotionEvent.ACTION_POINTER_UP:
+			if (mOnPointerPullListener != null)
+				mOnPointerPullListener.onPointerUp(event);
 			break;
 		case MotionEvent.ACTION_MOVE:
 			dispatchTouchEventMove(event);
@@ -244,6 +255,7 @@ public class Pull2SwitchWebView extends LinearLayout{
 		}
 		mBack = false;
 		mIsRecored = false;
+		reSetSkipJudgingBoundary();
 		mScrollDirection = ScrollDirection.NULL;
 		if (mState == Pull2SwitchWebViewState.DONE)
 			return;
@@ -358,10 +370,13 @@ public class Pull2SwitchWebView extends LinearLayout{
 		refreshScrollDirection(mOldEvent, event);//判断滑动方向
 		return isReadyForPullFromStart() || isReadyForPullFromEnd();
 	}
-
+	
+	private boolean mSkipJudgingBoundary = false;
 	private boolean isReadyForPullFromStart() {
 		if (mScrollDirection != ScrollDirection.TOP_2_BOTTOM)
 			return false;
+		if (mSkipJudgingBoundary)
+			return true;
 		float scrolly = mWebView.getScrollY();
 		return scrolly <= 0;
 	}
@@ -370,7 +385,8 @@ public class Pull2SwitchWebView extends LinearLayout{
 	private boolean isReadyForPullFromEnd() {
 		if (mScrollDirection != ScrollDirection.BOTTOM_2_TOP)
 			return false;
-
+		if (mSkipJudgingBoundary)
+			return true;
 		float scale = mWebView.getScale();
 		float contentHeight = mWebView.getContentHeight();
 		float height = mWebView.getHeight();
@@ -378,6 +394,20 @@ public class Pull2SwitchWebView extends LinearLayout{
 
 		float exactContentHeight = FloatMath.floor(contentHeight * scale);
 		return scrolly >= (exactContentHeight - height);
+	}
+
+	/**
+	 * @param mSkipJudgingBoundary the mSkipJudgingBoundary to set
+	 */
+	public void setSkipJudgingBoundary(boolean skipJudgingBoundary) {
+		this.mSkipJudgingBoundary = skipJudgingBoundary;
+	}
+
+	/**
+	 * @param mSkipJudgingBoundary the mSkipJudgingBoundary to reSet
+	 */
+	public void reSetSkipJudgingBoundary() {
+		setSkipJudgingBoundary(false);
 	}
 
 	private ScrollDirection mScrollDirection;
@@ -690,5 +720,15 @@ public class Pull2SwitchWebView extends LinearLayout{
 	public static interface OnPullListener{
 		public void onPullDownFromTop();
 		public void onPullUpFromBottom();
+	}
+
+	private OnPointerPullListener mOnPointerPullListener;
+	public void setOnPointerPullListener(OnPointerPullListener listener){
+		mOnPointerPullListener = listener;
+	}
+
+	public static interface OnPointerPullListener{
+		public void onPointerDown(MotionEvent event);
+		public void onPointerUp(MotionEvent event);
 	}
 }

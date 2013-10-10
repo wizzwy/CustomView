@@ -1,7 +1,6 @@
 package com.custom.webview;
 
 import com.custom.CustomGlobal;
-import com.custom.CustomGlobal.GesttureDirection;
 import com.custom.R;
 
 import android.annotation.SuppressLint;
@@ -421,16 +420,11 @@ public class Pull2SwitchWebView extends LinearLayout{
 			return;
 		}
 
-		GesttureDirection direction = CustomGlobal.getGesttureDirection(start, end);
-		switch (direction) {
+		switch (CustomGlobal.getGesttureNormalDirection(start, end)) {
 		case TOP:
-		case TOP_LEFT:
-		case TOP_RIGHT:
 			mScrollDirection = ScrollDirection.BOTTOM_2_TOP;
 			break;
 		case BOTTOM:
-		case BOTTOM_LEFT:
-		case BOTTOM_RIGHT:
 			mScrollDirection = ScrollDirection.TOP_2_BOTTOM;
 			break;
 		default:

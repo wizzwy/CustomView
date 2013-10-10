@@ -38,10 +38,17 @@ public class CustomGlobal {
 		view.measure(childWidthSpec, childHeightSpec);
 	}
 
+	/**
+	 * 精准的方向
+	 * @author zwy
+	 */
 	public enum GesttureDirection {
 		LEFT, RIGHT, TOP, BOTTOM, LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM, TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, MIDDLE_LEFT_TOP, MIDDLE_LEFT_BOTTOM, MIDDLE_RIGHT_TOP, MIDDLE_RIGHT_BOTTOM, NULL;
 	}
 
+	/**
+	 * 获取一个较为精准的方向，精确度为45读
+	 */
 	public static GesttureDirection getGesttureDirection(MotionEvent start, MotionEvent end) {
 		float startX = start.getRawX();
 		float startY = start.getRawY();
@@ -88,5 +95,61 @@ public class CustomGlobal {
 			return GesttureDirection.RIGHT_BOTTOM;
 		}
 		return GesttureDirection.NULL;
+	}
+
+	/**
+	 * 标准的方向，东南西北四个方向
+	 * @author zwy
+	 */
+	public enum GesttureNormalDirection {
+		LEFT, RIGHT, TOP, BOTTOM, NULL;
+	}
+
+	/**
+	 * 获取一个较为标准的方向，把45度便宜方向归结为东南西北四个方向
+	 */
+	public static GesttureNormalDirection getGesttureNormalDirection(MotionEvent start, MotionEvent end) {
+		switch (CustomGlobal.getGesttureDirection(start, end)) {
+		case LEFT:
+		case LEFT_TOP:
+		case LEFT_BOTTOM:
+			return GesttureNormalDirection.LEFT;
+		case RIGHT:
+		case RIGHT_TOP:
+		case RIGHT_BOTTOM:
+			return GesttureNormalDirection.RIGHT;
+		case TOP:
+		case TOP_LEFT:
+		case TOP_RIGHT:
+			return GesttureNormalDirection.TOP;
+		case BOTTOM:
+		case BOTTOM_LEFT:
+		case BOTTOM_RIGHT:
+			return GesttureNormalDirection.BOTTOM;
+		default:
+			return GesttureNormalDirection.NULL;
+		}
+	}
+
+	/**
+	 * 通过X方向移动距离判断是否跳过该次事件的判断
+	 * @param oldEvent 上一次事件
+	 * @param newEvent 当前事件
+	 * @param criticalDistance 临界距离
+	 * @return
+	 */
+	public static boolean skipCurrentMotionEventByRawX(MotionEvent oldEvent, MotionEvent newEvent, int criticalDistance){
+		return Math.abs(oldEvent.getRawX() - newEvent.getRawX()) <= criticalDistance;
+	}
+
+	/**
+	 * 通过Y方向移动距离判断是否跳过该次事件的判断
+	 * @param oldEvent 上一次事件
+	 * @param newEvent 当前事件
+	 * @param criticalDistance 临界距离
+	 * @return
+	 */
+	public static boolean skipCurrentMotionEventByRawY(MotionEvent oldEvent, MotionEvent newEvent, int criticalDistance){
+		return Math.abs(oldEvent.getRawY() - newEvent.getRawY()) <= criticalDistance;
 	}
 }
